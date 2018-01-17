@@ -27,20 +27,27 @@ The idea is that, having a clear conceptual roadmap to all approaches ,coupled w
 
 
 ---
+### Table of Contents 
 
-### Table of Contents - Directory
+- **Descriptive**
 
-- Descriptive
+- **Inferential**
+    - **Classical**
+        - **Frequentist**
+                                
+        - **Bayesian**
+                                
+    - **Machine Learning**
+        - **Supervised**
+            - **Regression**
+                                
+            - **Classification**
+                                
+        - **Unsupervised**
+                                
 
-
-- Inferential
-    - Classical
-        - Frequentist
-        
-        - Bayesian
-
-    - Machine Learning
-
+---
+### Directory Tree
 
 ---
 
@@ -53,3 +60,4 @@ The idea is that, having a clear conceptual roadmap to all approaches ,coupled w
 
 ### Reference Links
 
+1. Hastie Trevor, Efron Bradley, "**Computer Age Statistical Inference**, *Algorithms, Evidence, and Data Science*", 2017, Cambridge University Press
