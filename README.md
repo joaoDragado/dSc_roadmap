@@ -35,7 +35,7 @@ Each concept is (ideally) demonstrated via a real-life example / short project.
                                 
         - **Bayesian**
                                 
-    - **Machine Learning**
+    - **Machine_Learning**
         - **Supervised**
         *Labeled data are provided*
             - **Regression**
@@ -48,6 +48,23 @@ Each concept is (ideally) demonstrated via a real-life example / short project.
 
 ---
 ### **Directory Tree**
+- *generated via the **tree** bash command.*
+```bash
+.
+├── Descriptive
+├── Inferential
+│   ├── Classical
+│   │   ├── Bayesian
+│   │   └── Frequentist
+│   └── Machine_Learning
+│       ├── Supervised
+│       │   ├── Classification
+│       │   └── Regression
+│       └── Unsupervised
+└── README.md
+
+10 directories, 1 file
+```
 
 ---
 
