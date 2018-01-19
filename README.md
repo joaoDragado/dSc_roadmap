@@ -65,13 +65,22 @@ Each concept is (ideally) demonstrated via a real-life example / short project.
 │   │       └── Common_Statistical_Tests.html
 │   └── Machine_Learning
 │       ├── Choosing_ML_Algorithm_RoadMap.png
+│       ├── data
+│       │   ├── baseball.csv
+│       │   ├── boston.csv
+│       │   ├── nba_test.csv
+│       │   ├── nba_train.csv
+│       │   ├── wine.csv
+│       │   └── wine_test.csv
 │       ├── Supervised
 │       │   ├── Classification
 │       │   └── Regression
+│       │       ├── NBA_Moneyball.ipynb
+│       │       └── Predicting_Wine_prices.ipynb
 │       └── Unsupervised
 └── README.md
 
-10 directories, 3 files
+11 directories, 11 files
 
 ```
 
