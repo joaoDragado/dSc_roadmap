@@ -27,9 +27,11 @@ Each concept is (ideally) demonstrated via a real-life example / short project.
 ### **Table of Contents** 
 
 - **Descriptive** a.k.a. *Exploratory Data Analysis*
-*collect summary information : mean, st.dev., outliers, etc.*
+
+    *collect summary information : mean, st.dev., outliers, etc.*
 - **Inferential**
-*the predictive aspect of statistics.*
+    
+    *the predictive aspect of statistics.*
     - **Classical**
         - **Frequentist**
                                 
@@ -37,14 +39,18 @@ Each concept is (ideally) demonstrated via a real-life example / short project.
                                 
     - **Machine_Learning**
         - **Supervised**
-        *Labeled data are provided*
+        
+            *Labeled data are provided*
             - **Regression**
-            *Aims to predict **continuous** valued output ~ trying to find answer within a range.*
+            
+                *Aims to predict **continuous** valued output ~ trying to find answer within a range.*
                                 
             - **Classification**
-            *Aims to predict **discrete** valued output ~ answer will be True/False, Red/Blue/Green, etc.*                    
+            
+                *Aims to predict **discrete** valued output ~ answer will be True/False, Red/Blue/Green, etc.*                    
         - **Unsupervised**
-        *Our data are unlabebeled, the model needs to distinguish significant features within dataset.*                        
+        
+            *Our data are unlabebeled, the model needs to distinguish significant features within dataset.*                        
 
 ---
 ### **Directory Tree**
@@ -56,14 +62,17 @@ Each concept is (ideally) demonstrated via a real-life example / short project.
 │   ├── Classical
 │   │   ├── Bayesian
 │   │   └── Frequentist
+│   │       └── Common_Statistical_Tests.html
 │   └── Machine_Learning
+│       ├── Choosing_ML_Algorithm_RoadMap.png
 │       ├── Supervised
 │       │   ├── Classification
 │       │   └── Regression
 │       └── Unsupervised
 └── README.md
 
-10 directories, 1 file
+10 directories, 3 files
+
 ```
 
 ---
