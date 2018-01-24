@@ -70,18 +70,24 @@ Each concept is (ideally) demonstrated via a real-life example / short project.
 │       │   ├── boston.csv
 │       │   ├── nba_test.csv
 │       │   ├── nba_train.csv
+│       │   ├── quality.csv
+│       │   ├── stevens.csv
 │       │   ├── wine.csv
 │       │   └── wine_test.csv
 │       ├── Supervised
 │       │   ├── Classification
+│       │   │   ├── Classification_via_ItSL.html
+│       │   │   ├── Medical_Diagnosis_via_Logistic_Regression.ipynb
+│       │   │   └── Supreme_Court_Opinions.ipynb
 │       │   └── Regression
 │       │       ├── Boston_House_Prices--Decision_Trees.ipynb
+│       │       ├── Linear_Regression_via_ItSL.html
 │       │       ├── NBA_Moneyball.ipynb
 │       │       └── Predicting_Wine_prices.ipynb
 │       └── Unsupervised
 └── README.md
 
-11 directories, 12 files
+11 directories, 18 files
 
 ```
 
