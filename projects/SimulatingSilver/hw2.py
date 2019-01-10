@@ -4,6 +4,8 @@ import json
 import numpy as np
 import pandas as pd
 from scipy.special import erf
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import GridSearchCV
 
 import matplotlib as mpl
 import matplotlib.pyplot as plt
@@ -289,3 +291,130 @@ def biased_gallup(gallup, bias):
     g2 = gallup.copy()
     g2.Dem_Adv -= bias
     return uncertain_gallup_model(g2)
+
+
+def prepare_features(frame2008, featureslist):
+    '''
+    Building the data for Logistic Regression Model.
+    returns y, the vector of labels, and
+    X the feature-sample matrix where the columns are the features
+    in order from the list featurelist,
+    and each row is a data "point".
+    '''
+    y= frame2008.obama_win.values
+    X = frame2008[featureslist].values
+    if len(X.shape) == 1:
+        X = X.reshape(-1, 1)
+    return y, X
+
+
+def fit_logistic(frame2008, frame2012, featureslist, reg=0.0001):
+    '''
+    Fits a Logistic Regression Model
+    -----
+    args :
+        frame2008 (df) : known (priors) dataframe with features & responce
+        frame2012 (df) : dataframe with estimators to be used for prediction of posterior
+        reg (pos float) : regularization hyperparameter
+    returns :
+        df : our predictions for 2012 in 'Obama' col
+        clf2 : the LogReg model
+    '''
+    y, X = prepare_features(frame2008, featureslist)
+    clf2 = LogisticRegression(C=reg, solver='liblinear')
+    clf2.fit(X, y)
+    X_new = frame2012[featureslist]
+    # predict_proba returns an 2-col array,
+    # one for each class (0,1)=(lose,win)
+    obama_probs = clf2.predict_proba(X_new)[:, 1]
+
+    df = pd.DataFrame(index=frame2012.index)
+    df['Obama'] = obama_probs
+    return df, clf2
+
+
+def cv_optimize(frame2008, featureslist, n_folds=10, num_p=100):
+    y, X = prepare_features(frame2008, featureslist)
+    clf = LogisticRegression(solver='liblinear')
+    parameters = {"C": np.logspace(-4, 3, num=num_p)}
+    # setting return_train_score=False  to save on crossVal runtime
+    gs = GridSearchCV(clf, return_train_score=False,
+                      param_grid=parameters, cv=n_folds)
+    gs.fit(X, y)
+    return gs.best_params_, 1
+
+
+def points_plot(e2008, e2012, clf):
+    """
+    Visualize a 2-dimensional logistic regression
+    by plotting the probability as a function of each dimension.
+    Reveals  the decision boundary :
+        the set of parameter values
+        where the logistic fit yields P=0.5,
+        and shifts between a preference
+        for Obama or McCain/Romney.
+
+    e2008: The e2008 data
+    e2012: The e2012 data
+    clf: classifier
+    """
+    Xtrain = e2008[['Dem_Adv', 'pvi']].values
+    Xtest = e2012[['Dem_Adv', 'pvi']].values
+    ytrain = e2008['obama_win'].values == 1
+
+    X=np.concatenate((Xtrain, Xtest))
+
+    # evenly sampled points
+    x_min, x_max = X[:, 0].min() - .5, X[:, 0].max() + .5
+    y_min, y_max = X[:, 1].min() - .5, X[:, 1].max() + .5
+    xx, yy = np.meshgrid(np.linspace(x_min, x_max, 50),
+                         np.linspace(y_min, y_max, 50))
+    plt.xlim(xx.min(), xx.max())
+    plt.ylim(yy.min(), yy.max())
+
+    #plot background colors
+    ax = plt.gca()
+    Z = clf.predict_proba(np.c_[xx.ravel(), yy.ravel()])[:, 1]
+    Z = Z.reshape(xx.shape)
+    cs = ax.contourf(xx, yy, Z, cmap='RdBu', alpha=.5)
+    cs2 = ax.contour(xx, yy, Z, cmap='RdBu', alpha=.5)
+    plt.clabel(cs2, fmt = '%2.1f', colors = 'k', fontsize=14)
+
+    # Plot the 2008 points
+    ax.plot(Xtrain[ytrain == 0, 0], Xtrain[ytrain == 0, 1], 'ro', label='2008 McCain')
+    ax.plot(Xtrain[ytrain == 1, 0], Xtrain[ytrain == 1, 1], 'bo', label='2008 Obama')
+
+    # and the 2012 points
+    ax.scatter(Xtest[:, 0], Xtest[:, 1], edgecolor='white', marker="s", s=50, facecolor="k", alpha=.5, label='2012')
+    plt.legend(loc='upper left', scatterpoints=1, numpoints=1)
+
+    return ax
+
+
+def cv_and_fit(frame2008, frame2012, featureslist, n_folds=5):
+    '''
+    Optimize the params in featurelist for a Log Reg Model
+    Fit the data to predict Obama state electoral votes won in 2012 elections.
+    '''
+    bp, bs = cv_optimize(frame2008, featureslist, n_folds=n_folds)
+    predict, clf = fit_logistic(frame2008, frame2012, featureslist, reg=bp['C'])
+    return predict, clf
+
+
+def aggregated_poll_model(polls):
+    '''
+    Assume that the probability that Obama wins a state is given by the probability that a draw from a Gaussian with 𝜇=poll_mean and 𝜎=poll_std is positive.
+
+    args: polls(df) ;
+        cols = poll_mean, poll_std, Votes
+
+    returns: df indexed by State ;
+        cols :
+          Votes: Electoral votes for that state
+          Obama: Estimated probability that Obama wins the state
+    '''
+    sigma = polls.poll_std
+    prob = 1 - .5 * (1 + erf(-1*polls.poll_mean / np.sqrt(2 * sigma ** 2)))
+    return pd.DataFrame(dict(Obama=prob, Votes=polls.Votes))
+
+
