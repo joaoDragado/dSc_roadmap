@@ -418,3 +418,14 @@ def aggregated_poll_model(polls):
     return pd.DataFrame(dict(Obama=prob, Votes=polls.Votes))
 
 
+def default_missing(results):
+    '''
+    Some of the reddest and bluest states are not present in this data (people don't bother polling there as much).
+    The default_missing function gives them strong Democratic/Republican advantages.
+    '''
+    red_states = ["Alabama", "Alaska", "Arkansas", "Idaho", "Wyoming"]
+    blue_states = ["Delaware", "District of Columbia", "Hawaii"]
+    results.loc[red_states, ["poll_mean"]] = -100.0
+    results.loc[red_states, ["poll_std"]] = 0.1
+    results.loc[blue_states, ["poll_mean"]] = 100.0
+    results.loc[blue_states, ["poll_std"]] = 0.1
