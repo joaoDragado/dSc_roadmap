@@ -1,3 +1,5 @@
+import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 from matplotlib.rcsetup import cycler
@@ -16,7 +18,7 @@ dark2_colors = [(0.10588235294117647, 0.6196078431372549, 0.4666666666666667),
 from matplotlib.rcsetup import cycler
 
 mpl.rc('figure', figsize=(10,6), dpi=150)
-mpl.rc('axes', facecolor='white',
+mpl.rc('axes', facecolor='white', labelsize='medium',
        prop_cycle=cycler('color', dark2_colors ))
 mpl.rc('lines', lw=2)
 mpl.rc('patch', ec='white', fc=dark2_colors[0])
@@ -79,8 +81,62 @@ def make_xy(critics, vectorizer=None):
     X, Y = make_xy(critics)
     """
     if vectorizer is None:
-        vectorizer = CountVectorizer(ngram_range=(1, 2),
-                                     token_pattern=r'\b\w+\b')
+        vectorizer = CountVectorizer()
     X = vectorizer.fit_transform(critics.quote)
     Y = (critics.fresh == 'fresh').values.astype(int)
     return X, Y
+
+
+def calibration_plot(clf, xtest, ytest):
+  '''
+  Plots model-estimated probabilities against observed probabilities,
+  to determine whether the model ove/underfits, how & to what extent.
+  args
+  -------
+  clf : Classifier object
+      A MultinomialNB classifier
+  X : (Nexample, Nfeature) array
+      The bag-of-words data
+  Y : (Nexample) integer array
+      1 if a review is Fresh
+  '''
+  # model probabilities of freshness
+  prob = clf.predict_proba(xtest)[:,1]
+  # observed responces
+  outcome = ytest
+  data = pd.DataFrame(dict(prob=prob, outcome=outcome))
+
+  bins = np.linspace(0,1,20)
+  # sort probs & group into 20 equal-sized bins
+  cuts = pd.cut(prob, bins)
+  binwidth = bins[1] - bins[0]
+
+  # compute average observed freshness per bin
+  cal = data.groupby(cuts).outcome.agg(['mean', 'count'])
+  # pmid is the average model probability of each bin
+  cal['pmid'] = (bins[:-1] + bins[1:]) / 2
+  # sig is the model uncertainty (avg error) for each bin
+  cal['sig'] = np.sqrt(cal.pmid * (1 - cal.pmid) / cal['count'])
+
+  # setup subplots
+  fig, axes = plt.subplots(2,1, sharex=False, figsize=(11,9))
+
+  axes[0].set_title('Model Calibration')
+
+  # plot model estimations vs observed probs with errors
+  axes[0].errorbar(cal.pmid, cal['mean'], cal['sig'],
+                   elinewidth=1.8, capsize=2.5)
+  # plot y=x as perfect-fit reference
+  axes[0].plot(cal.pmid, cal.pmid,
+               linestyle='--', lw=1,
+               color='k')
+
+  axes[1].hist(prob, bins=bins,
+                  log=True, rwidth=0.8)
+
+  axes[0].set(xlabel="Predicted ~ P(Fresh)",
+              ylabel="Empirical ~ P(Fresh)")
+
+  axes[1].set(xlabel="Predicted ~ P(Fresh)",
+             ylabel="Numbers - log scale")
+
