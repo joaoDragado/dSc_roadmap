@@ -131,12 +131,12 @@ def calibration_plot(clf, xtest, ytest):
                linestyle='--', lw=1,
                color='k')
 
-  axes[1].hist(prob, bins=bins,
-                  log=True, rwidth=0.8)
+  axes[1].hist(prob, bins=bins, rwidth=0.8)
 
   axes[0].set(xlabel="Predicted ~ P(Fresh)",
               ylabel="Empirical ~ P(Fresh)")
 
   axes[1].set(xlabel="Predicted ~ P(Fresh)",
              ylabel="Numbers - log scale")
+
 
